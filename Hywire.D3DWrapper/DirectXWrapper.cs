@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace Hywire.D3DImageRenderer
+namespace Hywire.D3DWrapper
 {
     public struct ImageDisplayParameters
     {
         public float DisplayLimitHigh;
         public float DisplayLimitLow;
     }
-    public class D3DWrapper
+    public class DirectXWrapper
     {
         #region Private Fields
         private D3DRenderer _Renderer;
-        private IntPtr _WindowHandle;
-        private int _ImageWidth = 800;
-        private int _ImageHeight = 600;
+        private int _ImageWidth;
+        private int _ImageHeight;
         private IntPtr _BackBuffer;
         #endregion Private Fields
 
@@ -27,7 +25,7 @@ namespace Hywire.D3DImageRenderer
             get { return _BackBuffer; }
         }
         #endregion Public Properties
-        public D3DWrapper()
+        public DirectXWrapper()
         {
             _Renderer = new D3DRenderer();
         }
@@ -37,7 +35,7 @@ namespace Hywire.D3DImageRenderer
             _ImageWidth = imageWidth;
             _ImageHeight = imageHeight;
             _Renderer.Initialize(imagePath, _ImageWidth, _ImageHeight, hWnd);
-            _BackBuffer = _Renderer.CreateSurface(_ImageWidth, _ImageHeight);
+            _BackBuffer = _Renderer.SurfacePointer;
         }
         public void Draw(ImageDisplayParameters displayParameters)
         {

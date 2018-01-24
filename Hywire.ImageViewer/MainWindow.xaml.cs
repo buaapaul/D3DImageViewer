@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Hywire.D3DImageRenderer;
+using Hywire.D3DWrapper;
 using Microsoft.Win32;
 
 namespace Hywire.ImageViewer
@@ -24,12 +24,12 @@ namespace Hywire.ImageViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private D3DWrapper _ImageRenderer = null;
+        private DirectXWrapper _ImageWrapper = null;
         private BitmapImage _Image = null;
         private string _ImagePath;
         private ImageDisplayParameters _DisplayParameters = new ImageDisplayParameters()
         {
-            DisplayLimitHigh = 0.0001f,
+            DisplayLimitHigh = 1.0f,
             DisplayLimitLow = 0.0f,
         };
         public MainWindow()
@@ -39,7 +39,7 @@ namespace Hywire.ImageViewer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _ImageRenderer = new D3DWrapper();
+            _ImageWrapper = new DirectXWrapper();
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -73,8 +73,8 @@ namespace Hywire.ImageViewer
             {
                 return;
             }
-            _ImageRenderer.Initialize(_ImagePath, _Image.PixelWidth, _Image.PixelHeight, new WindowInteropHelper(this).Handle);
-            IntPtr pSurface = _ImageRenderer.BackBuffer;
+            _ImageWrapper.Initialize(_ImagePath, _Image.PixelWidth, _Image.PixelHeight, new WindowInteropHelper(this).Handle);
+            IntPtr pSurface = _ImageWrapper.BackBuffer;
             if (pSurface != IntPtr.Zero)
             {
                 d3dImg.Lock();
@@ -87,7 +87,7 @@ namespace Hywire.ImageViewer
         private void StopRendering()
         {
             CompositionTarget.Rendering -= CompositionTarget_Rendering;
-            _ImageRenderer.CleanUp();
+            _ImageWrapper.CleanUp();
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
@@ -95,7 +95,7 @@ namespace Hywire.ImageViewer
             if (d3dImg.IsFrontBufferAvailable)
             {
                 d3dImg.Lock();
-                _ImageRenderer.Draw(_DisplayParameters);
+                _ImageWrapper.Draw(_DisplayParameters);
                 d3dImg.AddDirtyRect(new Int32Rect(0, 0, d3dImg.PixelWidth, d3dImg.PixelHeight));
                 d3dImg.Unlock();
             }

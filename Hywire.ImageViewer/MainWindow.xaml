@@ -9,8 +9,8 @@
         Title="Hywire D3D Image Viewer" Height="640" Width="800" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" x:Name="menuRow"/>
-            <RowDefinition Height="auto" x:Name="imageRow"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Menu >
@@ -20,12 +20,14 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1">
-            <Image x:Name="imageContainer" Stretch="Uniform">
-                <Image.Source>
-                    <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
-                </Image.Source>
-            </Image>
+        <Grid Grid.Row="1" x:Name="imageGrid">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600">
+                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="Uniform">
+                    <Image.Source>
+                        <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
+                    </Image.Source>
+                </Image>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Window>
