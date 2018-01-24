@@ -3,10 +3,29 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:interop="clr-namespace:System.Windows.Interop;assembly=PresentationCore"
         xmlns:local="clr-namespace:Hywire.ImageViewer"
         mc:Ignorable="d"
-        Title="Hywire D3D Image Viewer" Height="640" Width="800" WindowStartupLocation="CenterScreen">
+        Title="Hywire D3D Image Viewer" Height="640" Width="800" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" x:Name="menuRow"/>
+            <RowDefinition Height="auto" x:Name="imageRow"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Menu >
+                <MenuItem Header="File">
+                    <MenuItem x:Name="menuOpen" Header="Open..." Click="menuOpen_Click"/>
+                    <MenuItem x:Name="menuExit" Header="Exit" Click="menuExit_Click"/>
+                </MenuItem>
+            </Menu>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Image x:Name="imageContainer" Stretch="Uniform">
+                <Image.Source>
+                    <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
+                </Image.Source>
+            </Image>
+        </Grid>
     </Grid>
 </Window>
