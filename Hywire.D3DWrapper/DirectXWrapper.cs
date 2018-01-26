@@ -34,6 +34,8 @@ namespace Hywire.D3DWrapper
         {
             _ImageWidth = imageWidth;
             _ImageHeight = imageHeight;
+            _ImageWidth = 625;
+            _ImageHeight = 250;
             _Renderer.Initialize(imagePath, _ImageWidth, _ImageHeight, hWnd);
             _BackBuffer = _Renderer.SurfacePointer;
         }

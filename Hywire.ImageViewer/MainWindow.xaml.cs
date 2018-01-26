@@ -29,7 +29,7 @@ namespace Hywire.ImageViewer
         private string _ImagePath;
         private ImageDisplayParameters _DisplayParameters = new ImageDisplayParameters()
         {
-            DisplayLimitHigh = 1.0f,
+            DisplayLimitHigh = 0.01f,
             DisplayLimitLow = 0.0f,
         };
         public MainWindow()
@@ -50,12 +50,14 @@ namespace Hywire.ImageViewer
             if (opDlg.ShowDialog() == true)
             {
                 _Image = new BitmapImage();
-                using (FileStream fs = File.OpenRead(opDlg.FileName))
+                //_Image = new BitmapImage(new Uri(opDlg.FileName));
+                //using (FileStream fs = File.OpenRead(opDlg.FileName))
+                using (FileStream fs = File.OpenRead(string.Format(@"C:\Users\paul\Desktop\fruits_by_mirella\orange.png")))
                 {
                     _Image.BeginInit();
                     _Image.StreamSource = fs;
-                    _Image.CacheOption = BitmapCacheOption.Default;
-                    _Image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                    _Image.CacheOption = BitmapCacheOption.OnLoad;
+                    //_Image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
                     _Image.EndInit();
                 }
                 _ImagePath = opDlg.FileName;

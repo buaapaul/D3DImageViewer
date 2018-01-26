@@ -21,13 +21,11 @@
             </Menu>
         </Grid>
         <Grid Grid.Row="1" x:Name="imageGrid">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600">
-                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="Uniform">
-                    <Image.Source>
-                        <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
-                    </Image.Source>
-                </Image>
-            </ScrollViewer>
+            <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="UniformToFill">
+                <Image.Source>
+                    <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
+                </Image.Source>
+            </Image>
         </Grid>
     </Grid>
 </Window>

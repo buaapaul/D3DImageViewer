@@ -47,15 +47,15 @@ namespace Hywire.D3DWrapper
                 SwapEffect = SwapEffect.Discard,
                 BackBufferFormat = Format.Unknown,
                 EnableAutoDepthStencil = true,
-                AutoDepthStencilFormat = Format.D24X8,
+                AutoDepthStencilFormat = Format.D16,
                 //Multisample = MultisampleType.TwoSamples,
                 //MultisampleQuality = 0,
             };
             _Device = new Device(_Direct3D, 0, DeviceType.Hardware, hWnd,
-                CreateFlags.SoftwareVertexProcessing | CreateFlags.Multithreaded | CreateFlags.FpuPreserve, d3dpp);
+                CreateFlags.HardwareVertexProcessing | CreateFlags.Multithreaded | CreateFlags.FpuPreserve, d3dpp);
             _Device.SetRenderState(RenderState.CullMode, Cull.None);
             _Device.SetRenderState(RenderState.Lighting, false);
-            _Device.SetRenderState(RenderState.ZEnable, true);
+            _Device.SetRenderState(RenderState.ZEnable, false);
             //_Device.SetRenderState(RenderState.MultisampleAntialias, true);
 
             SurfacePointer = CreateSurface(imageWidth, imageHeight);
@@ -65,13 +65,13 @@ namespace Hywire.D3DWrapper
             //_Texture = new Texture(_Device, image.Width, image.Height, 1, Usage.None, Format.A16B16G16R16, Pool.Default);
             //TextureShader textureShader = TextureShader.
             //_Texture.Fill()
-            _Texture = Texture.FromFile(_Device, imagePath, imageWidth, imageHeight, 0, Usage.None,
-                Format.Unknown, Pool.Managed, Filter.Linear, Filter.Linear, 0);
+            _Texture = Texture.FromFile(_Device, imagePath, imageWidth, imageHeight, 1, Usage.None,
+                Format.A16B16G16R16, Pool.Default, Filter.Linear, Filter.Linear, 0);
 
             InitGeometry();
 
-            //string effectPath = Environment.CurrentDirectory + "\\DisplayShader.fx";
-            string effectPath = string.Format(@"E:\Users\paul\Documents\Visual Studio 2015\Projects\Works\DirectXStudy\D3DImageViewer\Hywire.D3DWrapper\DisplayShader.fx");
+            string effectPath = Environment.CurrentDirectory + "\\DisplayShader.fx";
+            //string effectPath = string.Format(@"E:\Users\paul\Documents\Visual Studio 2015\Projects\Works\DirectXStudy\D3DImageViewer\Hywire.D3DWrapper\DisplayShader.fx");
             //string effectPath = string.Format(@"E:\Users\paul\Documents\Visual Studio 2015\Projects\Works\ImageDisplayer\Hywire.WPFD3DImageTest\PixelShader.fx");
             _Effect = Effect.FromFile(_Device, effectPath, ShaderFlags.NoPreshader);
             _Effect.SetTexture(_Effect.GetParameter(null, "g_Texture"), _Texture);
@@ -169,12 +169,13 @@ namespace Hywire.D3DWrapper
         {
             Matrix matWorld = Matrix.Identity;
 
-            Vector3 vecEye = new Vector3(0.0f, 0.0f, -2.0f);
+            Vector3 vecEye = new Vector3(0.0f, 0.0f, -5.0f);
             Vector3 vecLookAt = new Vector3(0.0f, 0.0f, 0.0f);
             Vector3 vecUp = new Vector3(0.0f, 1.0f, 0.0f);
             Matrix matView = Matrix.LookAtLH(vecEye, vecLookAt, vecUp);
 
-            Matrix matProj = Matrix.PerspectiveFovLH((float)Math.PI / 4, 1.0f / 1.0f, 0.1f, 100.0f);
+            Matrix matProj = Matrix.PerspectiveFovLH((float)Math.PI / 4, 1.0f / 2.5f, 0.1f, 100.0f);
+            //Matrix matProj = Matrix.PerspectiveLH(0.25f, 0.1f, 0.1f, 100.0f);
 
             _WorldViewProj = Matrix.Multiply(Matrix.Multiply(matWorld, matView), matProj);
         }
