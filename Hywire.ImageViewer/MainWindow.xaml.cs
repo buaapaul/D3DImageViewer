@@ -29,7 +29,7 @@ namespace Hywire.ImageViewer
         private string _ImagePath;
         private ImageDisplayParameters _DisplayParameters = new ImageDisplayParameters()
         {
-            DisplayLimitHigh = 0.01f,
+            DisplayLimitHigh = 1.0f,
             DisplayLimitLow = 0.0f,
         };
         public MainWindow()
@@ -46,22 +46,32 @@ namespace Hywire.ImageViewer
         {
             OpenFileDialog opDlg = new OpenFileDialog();
             opDlg.Filter = "(*.jpg,*.tiff,*.png)|*.jpg;*.tif;*.png";
-//            opDlg.FilterIndex = -1;
             if (opDlg.ShowDialog() == true)
             {
-                _Image = new BitmapImage();
-                //_Image = new BitmapImage(new Uri(opDlg.FileName));
-                //using (FileStream fs = File.OpenRead(opDlg.FileName))
-                using (FileStream fs = File.OpenRead(string.Format(@"C:\Users\paul\Desktop\fruits_by_mirella\orange.png")))
+                try
                 {
-                    _Image.BeginInit();
-                    _Image.StreamSource = fs;
-                    _Image.CacheOption = BitmapCacheOption.OnLoad;
-                    //_Image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                    _Image.EndInit();
+                    //using (FileStream fs = File.OpenRead(opDlg.FileName))
+                    FileStream fs = File.OpenRead(opDlg.FileName);
+                    {
+                        _Image = new BitmapImage();
+                        _Image.BeginInit();
+                        _Image.StreamSource = fs;
+                        _Image.CacheOption = BitmapCacheOption.OnLoad;
+                        _Image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                        _Image.EndInit();
+                    }
+                    //using (FileStream fs = File.OpenRead(opDlg.FileName))
+                    //{
+                    //    _Image = new Bitmap(opDlg.FileName);
+                    //}
+                    _ImagePath = opDlg.FileName;
+                    StartRendering();
                 }
-                _ImagePath = opDlg.FileName;
-                StartRendering();
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    _ImageWrapper.CleanUp();
+                }
             }
         }
 
@@ -75,7 +85,7 @@ namespace Hywire.ImageViewer
             {
                 return;
             }
-            _ImageWrapper.Initialize(_ImagePath, _Image.PixelWidth, _Image.PixelHeight, new WindowInteropHelper(this).Handle);
+            _ImageWrapper.Initialize(_Image, _Image.PixelWidth, _Image.PixelHeight, new WindowInteropHelper(this).Handle);
             IntPtr pSurface = _ImageWrapper.BackBuffer;
             if (pSurface != IntPtr.Zero)
             {

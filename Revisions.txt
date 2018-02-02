@@ -1,2 +1,7 @@
 20180123-V1.0.0.0
 Setup initial project for D3D image viewing in WPF;
+
+20180202-V1.0.3.0
+Set 'EnableAutoDepthStencil' false when initializing D3D device for compatibility;
+
+

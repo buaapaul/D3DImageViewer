@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Media.Imaging;
 
 namespace Hywire.D3DWrapper
 {
@@ -9,6 +11,7 @@ namespace Hywire.D3DWrapper
     {
         public float DisplayLimitHigh;
         public float DisplayLimitLow;
+        public float CameraPosition;
     }
     public class DirectXWrapper
     {
@@ -30,13 +33,11 @@ namespace Hywire.D3DWrapper
             _Renderer = new D3DRenderer();
         }
         #region Public Functions
-        public void Initialize(string imagePath, int imageWidth, int imageHeight, IntPtr hWnd)
+        public void Initialize(BitmapImage image, int imageWidth, int imageHeight, IntPtr hWnd)
         {
             _ImageWidth = imageWidth;
             _ImageHeight = imageHeight;
-            _ImageWidth = 625;
-            _ImageHeight = 250;
-            _Renderer.Initialize(imagePath, _ImageWidth, _ImageHeight, hWnd);
+            _Renderer.Initialize(image, _ImageWidth, _ImageHeight, hWnd);
             _BackBuffer = _Renderer.SurfacePointer;
         }
         public void Draw(ImageDisplayParameters displayParameters)

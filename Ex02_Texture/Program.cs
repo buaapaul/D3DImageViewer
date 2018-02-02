@@ -192,7 +192,7 @@ namespace Ex02_Texture
                 Format = SlimDX.DXGI.Format.R16G16B16A16_UNorm,
                 BindFlags = BindFlags.ShaderResource,
             };
-            _TextureRV = ShaderResourceView.FromFile(_Device, "haha.tif", imageLoadInfo);
+            _TextureRV = ShaderResourceView.FromFile(_Device, "haha.dds", imageLoadInfo);
             if (Result.Last.IsFailure)
             {
                 return Result.Last;
