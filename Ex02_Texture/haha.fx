@@ -47,5 +47,8 @@ PS_INPUT VS(VS_INPUT input)
 float4 PS(PS_INPUT input) : SV_Target
 {
 	float4 color = txDiffuse.Sample(samLinear, input.Tex);
-	return (color - 0.0f) / (300.0f / 65535.0f - 0.0f);
+	color.g = color.r;
+	color.b = color.r;
+	color.rgb = (color.rgb - 0.0f) / (300.0f / 65535.0f - 0.0f);
+	return color;
 }

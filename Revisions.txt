@@ -4,4 +4,6 @@ Setup initial project for D3D image viewing in WPF;
 20180202-V1.0.3.0
 Set 'EnableAutoDepthStencil' false when initializing D3D device for compatibility;
 
-
+20180202-V1.0.4.0
+Seperate texture into 4 parts, in order to load large images;
+Add a view model to the WPF project;

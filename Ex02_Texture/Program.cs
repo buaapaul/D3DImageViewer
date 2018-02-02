@@ -28,6 +28,8 @@ namespace Ex02_Texture
         private static ShaderResourceView _TextureRV;
         private static SamplerState _SamplerLinear;
 
+        private static ShaderResourceView _TextureRV2;
+
         static void Main(string[] args)
         {
             form = new RenderForm("Simple Texture Example");
@@ -144,8 +146,23 @@ namespace Ex02_Texture
             CustomVertex[] vertices = new CustomVertex[]
             {
                 new CustomVertex() {Pos=new Vector3(-1.0f, 1.0f, 0.0f ), Tex=new Vector2(0.0f, 0.0f) },     // top left
+                new CustomVertex() {Pos=new Vector3( 0.0f, 1.0f, 0.0f ), Tex=new Vector2(1.0f, 0.0f) },      // top right
+                new CustomVertex() {Pos=new Vector3(-1.0f, 0.0f, 0.0f ), Tex=new Vector2(0.0f, 1.0f) },    // lower left
+                new CustomVertex() {Pos=new Vector3( 0.0f, 0.0f, 0.0f ), Tex=new Vector2(1.0f, 1.0f) },     // lower right
+
+                new CustomVertex() {Pos=new Vector3( 0.0f, 1.0f, 0.0f ), Tex=new Vector2(0.0f, 0.0f) },     // top left
                 new CustomVertex() {Pos=new Vector3( 1.0f, 1.0f, 0.0f ), Tex=new Vector2(1.0f, 0.0f) },      // top right
+                new CustomVertex() {Pos=new Vector3( 0.0f, 0.0f, 0.0f ), Tex=new Vector2(0.0f, 1.0f) },    // lower left
+                new CustomVertex() {Pos=new Vector3( 1.0f, 0.0f, 0.0f ), Tex=new Vector2(1.0f, 1.0f) },     // lower right
+
+                new CustomVertex() {Pos=new Vector3(-1.0f, 0.0f, 0.0f ), Tex=new Vector2(0.0f, 0.0f) },     // top left
+                new CustomVertex() {Pos=new Vector3( 0.0f, 0.0f, 0.0f ), Tex=new Vector2(1.0f, 0.0f) },      // top right
                 new CustomVertex() {Pos=new Vector3(-1.0f,-1.0f, 0.0f ), Tex=new Vector2(0.0f, 1.0f) },    // lower left
+                new CustomVertex() {Pos=new Vector3( 0.0f,-1.0f, 0.0f ), Tex=new Vector2(1.0f, 1.0f) },     // lower right
+
+                new CustomVertex() {Pos=new Vector3( 0.0f, 0.0f, 0.0f ), Tex=new Vector2(0.0f, 0.0f) },     // top left
+                new CustomVertex() {Pos=new Vector3( 1.0f, 0.0f, 0.0f ), Tex=new Vector2(1.0f, 0.0f) },      // top right
+                new CustomVertex() {Pos=new Vector3( 0.0f,-1.0f, 0.0f ), Tex=new Vector2(0.0f, 1.0f) },    // lower left
                 new CustomVertex() {Pos=new Vector3( 1.0f,-1.0f, 0.0f ), Tex=new Vector2(1.0f, 1.0f) },     // lower right
             };
             DataStream vertexData = new DataStream(vertices, true, false);
@@ -171,6 +188,15 @@ namespace Ex02_Texture
             {
                 0,1,2,
                 1,3,2,
+
+                4,5,6,
+                5,7,6,
+
+                8,9,10,
+                9,11,10,
+
+                12,13,14,
+                13,15,14,
             };
             bufferDesc.SizeInBytes = sizeof(int) * indices.Length;
             bufferDesc.BindFlags = BindFlags.IndexBuffer;
@@ -189,10 +215,11 @@ namespace Ex02_Texture
             // Load the Texture
             ImageLoadInformation imageLoadInfo = new ImageLoadInformation
             {
-                Format = SlimDX.DXGI.Format.R16G16B16A16_UNorm,
+                Format = SlimDX.DXGI.Format.R16_UNorm,
                 BindFlags = BindFlags.ShaderResource,
             };
             _TextureRV = ShaderResourceView.FromFile(_Device, "haha.dds", imageLoadInfo);
+            _TextureRV2 = ShaderResourceView.FromFile(_Device, "haha.tif", imageLoadInfo);
             if (Result.Last.IsFailure)
             {
                 return Result.Last;
@@ -244,6 +271,12 @@ namespace Ex02_Texture
             _Device.ImmediateContext.PixelShader.SetShaderResource(_TextureRV, 0);
             _Device.ImmediateContext.PixelShader.SetSampler(_SamplerLinear, 0);
             _Device.ImmediateContext.DrawIndexed(6, 0, 0);
+
+            _Device.ImmediateContext.VertexShader.Set(_VertexShader);
+            _Device.ImmediateContext.PixelShader.Set(_PixelShader);
+            _Device.ImmediateContext.PixelShader.SetShaderResource(_TextureRV2, 0);
+            _Device.ImmediateContext.PixelShader.SetSampler(_SamplerLinear, 0);
+            _Device.ImmediateContext.DrawIndexed(18, 6, 0);
 
             // Present the information rendered to the back buffer to the front buffer (the screen)
             _SwapChain.Present(0, SlimDX.DXGI.PresentFlags.None);

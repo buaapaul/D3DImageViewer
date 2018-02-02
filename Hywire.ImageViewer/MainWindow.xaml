@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Menu >
@@ -21,11 +22,16 @@
             </Menu>
         </Grid>
         <Grid Grid.Row="1" x:Name="imageGrid">
-            <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="UniformToFill">
-                <Image.Source>
-                    <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
-                </Image.Source>
-            </Image>
+            <Grid Height="auto" Width="auto">
+                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="UniformToFill">
+                    <Image.Source>
+                        <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
+                    </Image.Source>
+                </Image>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Slider Width="300" Value="{Binding Path=DisplayRangeHigh}" Maximum="65535" Minimum="1"/>
         </Grid>
     </Grid>
 </Window>

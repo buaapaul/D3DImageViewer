@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Media.Imaging;
+using SlimDX;
 
 namespace Hywire.D3DWrapper
 {
@@ -11,14 +12,12 @@ namespace Hywire.D3DWrapper
     {
         public float DisplayLimitHigh;
         public float DisplayLimitLow;
-        public float CameraPosition;
+        public Vector3 ViewerPosition;
     }
     public class DirectXWrapper
     {
         #region Private Fields
         private D3DRenderer _Renderer;
-        private int _ImageWidth;
-        private int _ImageHeight;
         private IntPtr _BackBuffer;
         #endregion Private Fields
 
@@ -33,11 +32,9 @@ namespace Hywire.D3DWrapper
             _Renderer = new D3DRenderer();
         }
         #region Public Functions
-        public void Initialize(BitmapImage image, int imageWidth, int imageHeight, IntPtr hWnd)
+        public void Initialize(WriteableBitmap image, IntPtr hWnd)
         {
-            _ImageWidth = imageWidth;
-            _ImageHeight = imageHeight;
-            _Renderer.Initialize(image, _ImageWidth, _ImageHeight, hWnd);
+            _Renderer.Initialize(image, hWnd);
             _BackBuffer = _Renderer.SurfacePointer;
         }
         public void Draw(ImageDisplayParameters displayParameters)

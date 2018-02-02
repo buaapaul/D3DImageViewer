@@ -35,9 +35,9 @@ sampler MeshTextureSampler =
 sampler_state
 {
     Texture = <g_Texture>;
-    MipFilter = LINEAR;
-    MinFilter = LINEAR;
-    MagFilter = LINEAR;
+    MipFilter = POINT;
+    MinFilter = POINT;
+    MagFilter = POINT;
 };
 
 

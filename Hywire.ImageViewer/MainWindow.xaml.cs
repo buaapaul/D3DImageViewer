@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Hywire.D3DWrapper;
 using Microsoft.Win32;
+using SlimDX;
 
 namespace Hywire.ImageViewer
 {
@@ -24,17 +25,27 @@ namespace Hywire.ImageViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ViewModel _ViewModel = null;
+
         private DirectXWrapper _ImageWrapper = null;
-        private BitmapImage _Image = null;
-        private string _ImagePath;
-        private ImageDisplayParameters _DisplayParameters = new ImageDisplayParameters()
-        {
-            DisplayLimitHigh = 1.0f,
-            DisplayLimitLow = 0.0f,
-        };
+        private WriteableBitmap _Image = null;
         public MainWindow()
         {
             InitializeComponent();
+            _ViewModel = new ViewModel();
+            _ViewModel.OnUpdateImage += _ViewModel_OnUpdateImage;
+            DataContext = _ViewModel;
+        }
+
+        private void _ViewModel_OnUpdateImage(ImageDisplayParameters parameter)
+        {
+            if (d3dImg.IsFrontBufferAvailable)
+            {
+                d3dImg.Lock();
+                _ImageWrapper.Draw(parameter);
+                d3dImg.AddDirtyRect(new Int32Rect(0, 0, d3dImg.PixelWidth, d3dImg.PixelHeight));
+                d3dImg.Unlock();
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -50,24 +61,16 @@ namespace Hywire.ImageViewer
             {
                 try
                 {
-                    //using (FileStream fs = File.OpenRead(opDlg.FileName))
-                    FileStream fs = File.OpenRead(opDlg.FileName);
+                    using (FileStream fs = File.OpenRead(opDlg.FileName))
+                    //FileStream fs = File.OpenRead(opDlg.FileName);
                     {
-                        _Image = new BitmapImage();
-                        _Image.BeginInit();
-                        _Image.StreamSource = fs;
-                        _Image.CacheOption = BitmapCacheOption.OnLoad;
-                        _Image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                        _Image.EndInit();
+                        BitmapDecoder decoder = BitmapDecoder.Create(fs, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                        _Image = new WriteableBitmap(decoder.Frames[0]);
                     }
-                    //using (FileStream fs = File.OpenRead(opDlg.FileName))
-                    //{
-                    //    _Image = new Bitmap(opDlg.FileName);
-                    //}
-                    _ImagePath = opDlg.FileName;
                     StartRendering();
+                    _Image = null;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                     _ImageWrapper.CleanUp();
@@ -75,7 +78,7 @@ namespace Hywire.ImageViewer
             }
         }
 
-        private void StartRendering()
+        public void StartRendering()
         {
             if (!d3dImg.IsFrontBufferAvailable)
             {
@@ -85,32 +88,27 @@ namespace Hywire.ImageViewer
             {
                 return;
             }
-            _ImageWrapper.Initialize(_Image, _Image.PixelWidth, _Image.PixelHeight, new WindowInteropHelper(this).Handle);
+            _ImageWrapper.Initialize(_Image, new WindowInteropHelper(this).Handle);
             IntPtr pSurface = _ImageWrapper.BackBuffer;
             if (pSurface != IntPtr.Zero)
             {
                 d3dImg.Lock();
                 d3dImg.SetBackBuffer(D3DResourceType.IDirect3DSurface9, pSurface);
                 d3dImg.Unlock();
-                CompositionTarget.Rendering += CompositionTarget_Rendering;
+
+                if (d3dImg.IsFrontBufferAvailable)
+                {
+                    d3dImg.Lock();
+                    _ImageWrapper.Draw(_ViewModel.DisplayParameters);
+                    d3dImg.AddDirtyRect(new Int32Rect(0, 0, d3dImg.PixelWidth, d3dImg.PixelHeight));
+                    d3dImg.Unlock();
+                }
             }
         }
 
-        private void StopRendering()
+        public void StopRendering()
         {
-            CompositionTarget.Rendering -= CompositionTarget_Rendering;
             _ImageWrapper.CleanUp();
-        }
-
-        private void CompositionTarget_Rendering(object sender, EventArgs e)
-        {
-            if (d3dImg.IsFrontBufferAvailable)
-            {
-                d3dImg.Lock();
-                _ImageWrapper.Draw(_DisplayParameters);
-                d3dImg.AddDirtyRect(new Int32Rect(0, 0, d3dImg.PixelWidth, d3dImg.PixelHeight));
-                d3dImg.Unlock();
-            }
         }
 
         private void menuExit_Click(object sender, RoutedEventArgs e)
@@ -122,11 +120,11 @@ namespace Hywire.ImageViewer
         {
             if (d3dImg.IsFrontBufferAvailable)
             {
-                StartRendering();
+                //StartRendering();
             }
             else
             {
-                StopRendering();
+                //StopRendering();
             }
         }
 
