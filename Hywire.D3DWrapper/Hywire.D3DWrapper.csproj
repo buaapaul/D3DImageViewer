@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="D3DRenderer.cs" />
     <Compile Include="DirectXWrapper.cs" />
+    <Compile Include="ImageInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

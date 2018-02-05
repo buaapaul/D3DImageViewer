@@ -7,3 +7,7 @@ Set 'EnableAutoDepthStencil' false when initializing D3D device for compatibilit
 20180202-V1.0.4.0
 Seperate texture into 4 parts, in order to load large images;
 Add a view model to the WPF project;
+
+20180205-V1.0.5.0
+Modify the image loading method, use bitmapimage instead of writeablebitmap;
+Add mouse wheel event to scale the image;

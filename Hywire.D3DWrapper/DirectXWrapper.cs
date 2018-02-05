@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SlimDX;
+using System.IO;
+//using System.Drawing.Imaging;
 
 namespace Hywire.D3DWrapper
 {
@@ -32,9 +35,9 @@ namespace Hywire.D3DWrapper
             _Renderer = new D3DRenderer();
         }
         #region Public Functions
-        public void Initialize(WriteableBitmap image, IntPtr hWnd)
+        public void Initialize(ImageInfo imageInfo, IntPtr hWnd)
         {
-            _Renderer.Initialize(image, hWnd);
+            _Renderer.Initialize(imageInfo, hWnd);
             _BackBuffer = _Renderer.SurfacePointer;
         }
         public void Draw(ImageDisplayParameters displayParameters)

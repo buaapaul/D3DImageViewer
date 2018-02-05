@@ -7,6 +7,7 @@ using SlimDX.Direct3D9;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.IO;
+using System.Drawing.Imaging;
 
 namespace Hywire.D3DWrapper
 {
@@ -41,7 +42,7 @@ namespace Hywire.D3DWrapper
         #endregion Public Properties
 
         #region Public Functions
-        public Result Initialize(WriteableBitmap image, IntPtr hWnd)
+        public Result Initialize(ImageInfo imageInfo, IntPtr hWnd)
         {
             _Direct3D = new Direct3D();
             if (Result.Last.IsFailure)
@@ -65,17 +66,17 @@ namespace Hywire.D3DWrapper
             _Device.SetRenderState(RenderState.ZEnable, false);
             //_Device.SetRenderState(RenderState.MultisampleAntialias, true);
 
-            SurfacePointer = CreateSurface(image.PixelWidth, image.PixelHeight);
-            //SurfacePointer = CreateSurface((int)image.Width, (int)image.Height);
+            //SurfacePointer = CreateSurface(image.PixelWidth, image.PixelHeight);
+            SurfacePointer = CreateSurface(imageInfo.PixelWidth, imageInfo.PixelHeight);
 
-            CreateTextures(image);
+            CreateTextures(imageInfo);
 
             InitGeometry();
 
             string effectPath = Environment.CurrentDirectory + "\\DisplayShader.fx";
             _Effect = Effect.FromFile(_Device, effectPath, ShaderFlags.NoPreshader);
 
-            image = null;
+            imageInfo = null;
 
             return Result.Last;
         }
@@ -181,27 +182,20 @@ namespace Hywire.D3DWrapper
         #endregion Public Functions
 
         #region Private Functions
-        private Result CreateTextures(WriteableBitmap image)
+        private Result CreateTextures(ImageInfo imageInfo)
         {
-            int dataLength = image.BackBufferStride * image.PixelHeight;
-            byte[] pixelData = new byte[dataLength];
-            //image.CopyPixels(pixelData, image.BackBufferStride, 0);
-            //_Texture = new Texture(_Device, image.PixelWidth, image.PixelHeight, 1, Usage.None, Format.L16, Pool.Managed);
-            //DataRectangle texRect = _Texture.LockRectangle(0, LockFlags.None);
-            //texRect.Data.WriteRange(pixelData);
-            //_Texture.UnlockRectangle(0);
-
-            int leftTexWidth = image.PixelWidth / 2;
-            int rightTexWidth = image.PixelWidth - leftTexWidth + 1;
-            int topTexHeight = image.PixelHeight / 2;
-            int lowerTexHeight = image.PixelHeight - topTexHeight + 1;
+            int leftTexWidth = imageInfo.PixelWidth / 2;
+            int rightTexWidth = imageInfo.PixelWidth - leftTexWidth + 1;
+            int topTexHeight = imageInfo.PixelHeight / 2;
+            int lowerTexHeight = imageInfo.PixelHeight - topTexHeight + 1;
 
             _TexTopLeft = new Texture(_Device, leftTexWidth, topTexHeight, 1, Usage.None, Format.L16, Pool.Managed);
             _TexTopRight = new Texture(_Device, rightTexWidth, topTexHeight, 1, Usage.None, Format.L16, Pool.Managed);
             _TexLowerLeft = new Texture(_Device, leftTexWidth, lowerTexHeight, 1, Usage.None, Format.L16, Pool.Managed);
             _TexLowerRight = new Texture(_Device, rightTexWidth, lowerTexHeight, 1, Usage.None, Format.L16, Pool.Managed);
 
-            image.CopyPixels(new System.Windows.Int32Rect(leftTexWidth - 1, 0, rightTexWidth, topTexHeight), pixelData, rightTexWidth * 2, 0);
+            byte[] pixelData = new byte[imageInfo.BackBufferStride * imageInfo.PixelHeight];
+            imageInfo.Image.CopyPixels(new System.Windows.Int32Rect(leftTexWidth - 1, 0, rightTexWidth, topTexHeight), pixelData, rightTexWidth * 2, 0);
             DataRectangle texData = _TexTopRight.LockRectangle(0, LockFlags.None);
             byte[] tempBytes = new byte[texData.Data.Length];
             for (int i = 0; i < topTexHeight; i++)
@@ -213,8 +207,11 @@ namespace Hywire.D3DWrapper
             }
             texData.Data.WriteRange(tempBytes);
             _TexTopRight.UnlockRectangle(0);
+            texData.Data.Dispose();
+            texData = null;
+            tempBytes = null;
 
-            image.CopyPixels(new System.Windows.Int32Rect(0, 0, leftTexWidth, topTexHeight), pixelData, leftTexWidth * 2, 0);
+            imageInfo.Image.CopyPixels(new System.Windows.Int32Rect(0, 0, leftTexWidth, topTexHeight), pixelData, leftTexWidth * 2, 0);
             texData = _TexTopLeft.LockRectangle(0, LockFlags.None);
             tempBytes = new byte[texData.Data.Length];
             for (int i = 0; i < topTexHeight; i++)
@@ -226,8 +223,11 @@ namespace Hywire.D3DWrapper
             }
             texData.Data.WriteRange(tempBytes);
             _TexTopLeft.UnlockRectangle(0);
+            texData.Data.Dispose();
+            texData = null;
+            tempBytes = null;
 
-            image.CopyPixels(new System.Windows.Int32Rect(0, topTexHeight - 1, leftTexWidth, lowerTexHeight), pixelData, leftTexWidth * 2, 0);
+            imageInfo.Image.CopyPixels(new System.Windows.Int32Rect(0, topTexHeight - 1, leftTexWidth, lowerTexHeight), pixelData, leftTexWidth * 2, 0);
             texData = _TexLowerLeft.LockRectangle(0, LockFlags.None);
             tempBytes = new byte[texData.Data.Length];
             for (int i = 0; i < lowerTexHeight; i++)
@@ -239,8 +239,11 @@ namespace Hywire.D3DWrapper
             }
             texData.Data.WriteRange(tempBytes);
             _TexLowerLeft.UnlockRectangle(0);
+            texData.Data.Dispose();
+            texData = null;
+            tempBytes = null;
 
-            image.CopyPixels(new System.Windows.Int32Rect(leftTexWidth - 1, topTexHeight - 1, rightTexWidth, lowerTexHeight), pixelData, rightTexWidth * 2, 0);
+            imageInfo.Image.CopyPixels(new System.Windows.Int32Rect(leftTexWidth - 1, topTexHeight - 1, rightTexWidth, lowerTexHeight), pixelData, rightTexWidth * 2, 0);
             texData = _TexLowerRight.LockRectangle(0, LockFlags.None);
             tempBytes = new byte[texData.Data.Length];
             for (int i = 0; i < lowerTexHeight; i++)
@@ -252,12 +255,11 @@ namespace Hywire.D3DWrapper
             }
             texData.Data.WriteRange(tempBytes);
             _TexLowerRight.UnlockRectangle(0);
-
-            pixelData = null;
+            texData.Data.Dispose();
             texData = null;
             tempBytes = null;
-            image = null;
-            GC.Collect();
+
+            pixelData = null;
 
             return Result.Last;
         }

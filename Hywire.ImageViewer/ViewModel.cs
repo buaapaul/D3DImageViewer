@@ -23,13 +23,17 @@ namespace Hywire.ImageViewer
         {
             DisplayLimitHigh = 1.0f,
             DisplayLimitLow = 0.0f,
-            ViewerPosition = new Vector3(-0.0f, 0.0f, -1.0f),
+            ViewerPosition = new Vector3(0.0f, 0.0f, -1.0f),
         };
         #endregion Private Fields
 
         public ViewModel()
         {
-
+            _DisplayRangeHigh = 65535;
+            _DisplayRangeLow = 0;
+            _LookAtX = 0.0f;
+            _LookAtY = 0.0f;
+            _ViewScale = 1.0f;
         }
         #region Public Properties
         public int DisplayRangeHigh
@@ -110,7 +114,19 @@ namespace Hywire.ImageViewer
                 if (_ViewScale != value)
                 {
                     _ViewScale = value;
+                    if (_ViewScale < 1.0f)
+                    {
+                        _ViewScale = 1.0f;
+                        _LookAtX = 0.0f;
+                        _LookAtY = 0.0f;
+                    }
+                    if (_ViewScale > 25.0f)
+                    {
+                        _ViewScale = 25.0f;
+                    }
                     RaisePropertyChanged("ViewScale");
+                    _DisplayParameters.ViewerPosition = new Vector3(_LookAtX, _LookAtY, -1.0f / _ViewScale);
+                    OnUpdateImage(_DisplayParameters);
                 }
             }
         }

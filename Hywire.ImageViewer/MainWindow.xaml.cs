@@ -28,7 +28,7 @@ namespace Hywire.ImageViewer
         private ViewModel _ViewModel = null;
 
         private DirectXWrapper _ImageWrapper = null;
-        private WriteableBitmap _Image = null;
+        private ImageInfo _ImageInfo = null;
         public MainWindow()
         {
             InitializeComponent();
@@ -62,13 +62,16 @@ namespace Hywire.ImageViewer
                 try
                 {
                     using (FileStream fs = File.OpenRead(opDlg.FileName))
-                    //FileStream fs = File.OpenRead(opDlg.FileName);
                     {
-                        BitmapDecoder decoder = BitmapDecoder.Create(fs, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-                        _Image = new WriteableBitmap(decoder.Frames[0]);
+                        BitmapImage _BmpImg = new BitmapImage();
+                        _BmpImg.BeginInit();
+                        _BmpImg.CacheOption = BitmapCacheOption.OnLoad;
+                        _BmpImg.CreateOptions = BitmapCreateOptions.None | BitmapCreateOptions.PreservePixelFormat;
+                        _BmpImg.StreamSource = fs;
+                        _BmpImg.EndInit();
+                        _ImageInfo = new ImageInfo(_BmpImg);
                     }
                     StartRendering();
-                    _Image = null;
                 }
                 catch (Exception ex)
                 {
@@ -80,15 +83,9 @@ namespace Hywire.ImageViewer
 
         public void StartRendering()
         {
-            if (!d3dImg.IsFrontBufferAvailable)
-            {
-                return;
-            }
-            if (_Image == null)
-            {
-                return;
-            }
-            _ImageWrapper.Initialize(_Image, new WindowInteropHelper(this).Handle);
+            _ImageWrapper.Initialize(_ImageInfo, new WindowInteropHelper(this).Handle);
+            //_ImageWrapper.Initialize(_Image, new WindowInteropHelper(this).Handle);
+            //_ImageWrapper.Initialize(_Bitmap, new WindowInteropHelper(this).Handle);
             IntPtr pSurface = _ImageWrapper.BackBuffer;
             if (pSurface != IntPtr.Zero)
             {
@@ -131,6 +128,19 @@ namespace Hywire.ImageViewer
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             StopRendering();
+        }
+
+        private void menuClose_Click(object sender, RoutedEventArgs e)
+        {
+            _ImageInfo = null;
+        }
+
+        private void imageContainer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            System.Windows.Point pt = e.GetPosition(imageContainer);
+            _ViewModel.LookAtX = (float)(pt.X / imageContainer.ActualWidth / 2 - 1);
+            _ViewModel.LookAtY = (float)(1 - pt.Y / imageContainer.ActualHeight / 2);
+            _ViewModel.ViewScale += e.Delta / 1000.0f;
         }
     }
 }

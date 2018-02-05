@@ -17,13 +17,14 @@
             <Menu >
                 <MenuItem Header="File">
                     <MenuItem x:Name="menuOpen" Header="Open..." Click="menuOpen_Click"/>
+                    <MenuItem x:Name="menuClose" Header="Close" Click="menuClose_Click"/>
                     <MenuItem x:Name="menuExit" Header="Exit" Click="menuExit_Click"/>
                 </MenuItem>
             </Menu>
         </Grid>
         <Grid Grid.Row="1" x:Name="imageGrid">
             <Grid Height="auto" Width="auto">
-                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="UniformToFill">
+                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="UniformToFill" MouseWheel="imageContainer_MouseWheel">
                     <Image.Source>
                         <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
                     </Image.Source>

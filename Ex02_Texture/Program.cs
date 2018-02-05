@@ -25,10 +25,12 @@ namespace Ex02_Texture
         static PixelShader _PixelShader;
         private static SlimDX.Direct3D11.Buffer _VertexBuffer;
         private static SlimDX.Direct3D11.Buffer _IndexBuffer;
-        private static ShaderResourceView _TextureRV;
+        private static ShaderResourceView _TextureRV1;
+        private static ShaderResourceView _TextureRV2;
+        private static ShaderResourceView _TextureRV3;
+        private static ShaderResourceView _TextureRV4;
         private static SamplerState _SamplerLinear;
 
-        private static ShaderResourceView _TextureRV2;
 
         static void Main(string[] args)
         {
@@ -213,13 +215,7 @@ namespace Ex02_Texture
             _Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
             // Load the Texture
-            ImageLoadInformation imageLoadInfo = new ImageLoadInformation
-            {
-                Format = SlimDX.DXGI.Format.R16_UNorm,
-                BindFlags = BindFlags.ShaderResource,
-            };
-            _TextureRV = ShaderResourceView.FromFile(_Device, "haha.dds", imageLoadInfo);
-            _TextureRV2 = ShaderResourceView.FromFile(_Device, "haha.tif", imageLoadInfo);
+            LoadTexture();
             if (Result.Last.IsFailure)
             {
                 return Result.Last;
@@ -268,7 +264,7 @@ namespace Ex02_Texture
             // Render a triangle
             _Device.ImmediateContext.VertexShader.Set(_VertexShader);
             _Device.ImmediateContext.PixelShader.Set(_PixelShader);
-            _Device.ImmediateContext.PixelShader.SetShaderResource(_TextureRV, 0);
+            _Device.ImmediateContext.PixelShader.SetShaderResource(_TextureRV1, 0);
             _Device.ImmediateContext.PixelShader.SetSampler(_SamplerLinear, 0);
             _Device.ImmediateContext.DrawIndexed(6, 0, 0);
 
@@ -280,6 +276,16 @@ namespace Ex02_Texture
 
             // Present the information rendered to the back buffer to the front buffer (the screen)
             _SwapChain.Present(0, SlimDX.DXGI.PresentFlags.None);
+        }
+        static void LoadTexture()
+        {
+            ImageLoadInformation imageLoadInfo = new ImageLoadInformation
+            {
+                Format = SlimDX.DXGI.Format.R16_UNorm,
+                BindFlags = BindFlags.ShaderResource,
+            };
+            _TextureRV1 = ShaderResourceView.FromFile(_Device, "haha.dds", imageLoadInfo);
+            _TextureRV2 = ShaderResourceView.FromFile(_Device, "C:\\users\\paul\\desktop\\15000x6000.tif", imageLoadInfo);
         }
     }
 }
