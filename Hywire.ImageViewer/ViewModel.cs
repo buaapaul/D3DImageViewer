@@ -44,6 +44,10 @@ namespace Hywire.ImageViewer
                 if (_DisplayRangeHigh != value)
                 {
                     _DisplayRangeHigh = value;
+                    if (_DisplayRangeHigh <= _DisplayRangeLow)
+                    {
+                        _DisplayRangeHigh = _DisplayRangeLow + 1;
+                    }
                     RaisePropertyChanged("DisplayRangeHigh");
                     _DisplayParameters.DisplayLimitHigh = _DisplayRangeHigh / 65535.0f;
                     OnUpdateImage(_DisplayParameters);
@@ -63,7 +67,13 @@ namespace Hywire.ImageViewer
                 if (_DisplayRangeLow != value)
                 {
                     _DisplayRangeLow = value;
+                    if (_DisplayRangeLow >= _DisplayRangeHigh)
+                    {
+                        _DisplayRangeLow = _DisplayRangeHigh - 1;
+                    }
                     RaisePropertyChanged("DisplayRangeLow");
+                    _DisplayParameters.DisplayLimitLow = _DisplayRangeLow / 65535.0f;
+                    OnUpdateImage(_DisplayParameters);
                 }
             }
         }

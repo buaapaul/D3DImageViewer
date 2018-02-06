@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using SlimDX;
+using System.IO;
+//using System.Drawing.Imaging;
+
+namespace Hywire.D3DWrapper
+{
+    public struct ImageDisplayParameters
+    {
+        public float DisplayLimitHigh;
+        public float DisplayLimitLow;
+        public Vector3 ViewerPosition;
+    }
+    public class D3DImageRenderer
+    {
+        #region Private Fields
+        private DirectXWrapper _Renderer;
+        private IntPtr _BackBuffer;
+        private bool _IsInitialized;
+        #endregion Private Fields
+
+        #region Public Properties
+        public IntPtr BackBuffer
+        {
+            get { return _BackBuffer; }
+        }
+
+        public bool IsInitialized
+        {
+            get
+            {
+                return _IsInitialized;
+            }
+        }
+        #endregion Public Properties
+        public D3DImageRenderer()
+        {
+            _Renderer = new DirectXWrapper();
+        }
+        #region Public Functions
+        public void Initialize(ImageInfo imageInfo, IntPtr hWnd)
+        {
+            _Renderer.Initialize(imageInfo, hWnd);
+            _BackBuffer = _Renderer.SurfacePointer;
+            _IsInitialized = true;
+        }
+        public void Draw(ImageDisplayParameters displayParameters)
+        {
+            _Renderer.Draw(displayParameters);
+        }
+        public void CleanUp()
+        {
+            _Renderer.CleanUp();
+            _IsInitialized = false;
+        }
+        #endregion Public Functions
+    }
+}

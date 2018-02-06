@@ -63,7 +63,7 @@ namespace Ex02_Texture
                 {
                     Width = width,
                     Height = height,
-                    Format = SlimDX.DXGI.Format.B8G8R8A8_UNorm,
+                    Format = SlimDX.DXGI.Format.R8G8B8A8_UNorm,
                     RefreshRate = new Rational(60, 1),
                 },
                 Usage = SlimDX.DXGI.Usage.RenderTargetOutput,

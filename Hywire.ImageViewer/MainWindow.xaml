@@ -6,12 +6,12 @@
         xmlns:interop="clr-namespace:System.Windows.Interop;assembly=PresentationCore"
         xmlns:local="clr-namespace:Hywire.ImageViewer"
         mc:Ignorable="d"
-        Title="Hywire D3D Image Viewer" Height="640" Width="800" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Hywire D3D Image Viewer" Height="800" Width="1280" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="500*"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Menu >
@@ -22,17 +22,20 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1" x:Name="imageGrid">
-            <Grid Height="auto" Width="auto">
-                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Stretch="UniformToFill" MouseWheel="imageContainer_MouseWheel">
-                    <Image.Source>
-                        <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
-                    </Image.Source>
-                </Image>
-            </Grid>
+        <Grid Grid.Row="1" x:Name="imageGrid" Background="#FF83837B">
+            <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Stretch="UniformToFill" MouseWheel="imageContainer_MouseWheel">
+                <Image.Source>
+                    <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
+                </Image.Source>
+            </Image>
         </Grid>
         <Grid Grid.Row="2">
-            <Slider Width="300" Value="{Binding Path=DisplayRangeHigh}" Maximum="65535" Minimum="1"/>
+            <Label Content="Display High" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,10,0,0"
+                    Value="{Binding Path=DisplayRangeHigh}" Maximum="65535" Minimum="1"/>
+            <Label Content="Display Low" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0"/>
+            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,40,0,0"
+                    Value="{Binding Path=DisplayRangeLow}" Maximum="65534" Minimum="0"/>
         </Grid>
     </Grid>
 </Window>

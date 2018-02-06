@@ -27,7 +27,7 @@ namespace Hywire.ImageViewer
     {
         private ViewModel _ViewModel = null;
 
-        private DirectXWrapper _ImageWrapper = null;
+        private D3DImageRenderer _ImageWrapper = null;
         private ImageInfo _ImageInfo = null;
         public MainWindow()
         {
@@ -39,6 +39,10 @@ namespace Hywire.ImageViewer
 
         private void _ViewModel_OnUpdateImage(ImageDisplayParameters parameter)
         {
+            if (!_ImageWrapper.IsInitialized)
+            {
+                return;
+            }
             if (d3dImg.IsFrontBufferAvailable)
             {
                 d3dImg.Lock();
@@ -50,7 +54,7 @@ namespace Hywire.ImageViewer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _ImageWrapper = new DirectXWrapper();
+            _ImageWrapper = new D3DImageRenderer();
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -63,13 +67,13 @@ namespace Hywire.ImageViewer
                 {
                     using (FileStream fs = File.OpenRead(opDlg.FileName))
                     {
-                        BitmapImage _BmpImg = new BitmapImage();
-                        _BmpImg.BeginInit();
-                        _BmpImg.CacheOption = BitmapCacheOption.OnLoad;
-                        _BmpImg.CreateOptions = BitmapCreateOptions.None | BitmapCreateOptions.PreservePixelFormat;
-                        _BmpImg.StreamSource = fs;
-                        _BmpImg.EndInit();
-                        _ImageInfo = new ImageInfo(_BmpImg);
+                        BitmapImage img = new BitmapImage();
+                        img.BeginInit();
+                        img.CacheOption = BitmapCacheOption.OnLoad;
+                        img.CreateOptions = BitmapCreateOptions.None | BitmapCreateOptions.PreservePixelFormat;
+                        img.StreamSource = fs;
+                        img.EndInit();
+                        _ImageInfo = new ImageInfo(img);
                     }
                     StartRendering();
                 }
@@ -84,8 +88,6 @@ namespace Hywire.ImageViewer
         public void StartRendering()
         {
             _ImageWrapper.Initialize(_ImageInfo, new WindowInteropHelper(this).Handle);
-            //_ImageWrapper.Initialize(_Image, new WindowInteropHelper(this).Handle);
-            //_ImageWrapper.Initialize(_Bitmap, new WindowInteropHelper(this).Handle);
             IntPtr pSurface = _ImageWrapper.BackBuffer;
             if (pSurface != IntPtr.Zero)
             {
@@ -105,6 +107,9 @@ namespace Hywire.ImageViewer
 
         public void StopRendering()
         {
+            d3dImg.Lock();
+            d3dImg.SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
+            d3dImg.Unlock();
             _ImageWrapper.CleanUp();
         }
 
@@ -132,14 +137,19 @@ namespace Hywire.ImageViewer
 
         private void menuClose_Click(object sender, RoutedEventArgs e)
         {
-            _ImageInfo = null;
+            if (_ImageInfo != null)
+            {
+                _ImageInfo.Dispose();
+                _ImageInfo = null;
+            }
+            StopRendering();
         }
 
         private void imageContainer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            System.Windows.Point pt = e.GetPosition(imageContainer);
-            _ViewModel.LookAtX = (float)(pt.X / imageContainer.ActualWidth / 2 - 1);
-            _ViewModel.LookAtY = (float)(1 - pt.Y / imageContainer.ActualHeight / 2);
+            System.Windows.Point pt = e.GetPosition(imageGrid);
+            _ViewModel.LookAtX = (float)(pt.X / imageGrid.ActualWidth * 2 - 1);
+            _ViewModel.LookAtY = (float)(1 - pt.Y / imageGrid.ActualHeight * 2);
             _ViewModel.ViewScale += e.Delta / 1000.0f;
         }
     }
