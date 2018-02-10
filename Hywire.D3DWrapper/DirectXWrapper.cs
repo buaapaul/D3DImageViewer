@@ -77,38 +77,6 @@ namespace Hywire.D3DWrapper
 
             return Result.Last;
         }
-        private IntPtr CreateSurface(int imageWidth, int imageHeight)
-        {
-            int tempWidth = imageWidth;
-            int tempHeight = imageHeight;
-            double scale = 1.0;
-            if (imageWidth > 2048)
-            {
-                scale = 2048.0 / imageWidth;
-            }
-            imageHeight = (int)(scale * imageHeight);
-            if (imageHeight > 2048)
-            {
-                scale = scale * (2048.0 / imageHeight);
-            }
-            tempWidth = (int)(tempWidth * scale);
-            tempHeight = (int)(tempHeight * scale);
-
-            _Surface = Surface.CreateRenderTarget(_Device, tempWidth, tempHeight, Format.A8R8G8B8, MultisampleType.None, 0, true);
-            if (Result.Last.IsFailure)
-            {
-                return IntPtr.Zero;
-            }
-            _Device.SetRenderTarget(0, _Surface);
-            if (Result.Last.IsFailure)
-            {
-                return IntPtr.Zero;
-            }
-            else
-            {
-                return _Surface.ComPointer;
-            }
-        }
         public void Draw(ImageDisplayParameters displayParameters)
         {
             _Device.Clear(ClearFlags.Target, Color.Transparent.ToArgb(), 1.0f, 0);
@@ -228,29 +196,78 @@ namespace Hywire.D3DWrapper
                         imgRect.Height = texAverageHeight + 1;
                         imgRect.Y = i * texAverageHeight - 1;
                     }
-                    _Textures[i * _TextureHorizontalDivide + j] = new Texture(_Device, imgRect.Width, imgRect.Height, 1, Usage.None, imageInfo.PixelFormat, Pool.Managed);
+                    Texture tmpTexture = new Texture(_Device, imgRect.Width, imgRect.Height, 1, Usage.None, imageInfo.PixelFormat, Pool.SystemMemory);
+                    _Textures[i * _TextureHorizontalDivide + j] = new Texture(_Device, imgRect.Width, imgRect.Height, 1, Usage.None, imageInfo.PixelFormat, Pool.Default);
                     imageInfo.Image.CopyPixels(imgRect, pixels, imgRect.Width * imageInfo.BytesPerPixel, 0);
-                    texDataRect = _Textures[i * _TextureHorizontalDivide + j].LockRectangle(0, LockFlags.None);
+                    texDataRect = tmpTexture.LockRectangle(0, LockFlags.None);
+                    //texDataRect = _Textures[i * _TextureHorizontalDivide + j].LockRectangle(0, LockFlags.None);
                     byte[] texDataBytes = new byte[texDataRect.Data.Length];
+                    int texelBytesPerPixel = texDataRect.Pitch / imgRect.Width;
+                    int bytesOffset;
                     for(int m = 0; m < imgRect.Height; m++)
                     {
                         for (int n = 0; n < imgRect.Width; n++)
                         {
-                            for(int p=0;p < imageInfo.BytesPerPixel; p++)
+                            texelBytesPerPixel = texDataRect.Pitch / imgRect.Width;
+                            bytesOffset = 0;
+                            for (int p=0;p < imageInfo.BytesPerPixel; p++)
                             {
-                                texDataBytes[m * texDataRect.Pitch + n * imageInfo.BytesPerPixel + p] = pixels[m * imgRect.Width * imageInfo.BytesPerPixel + n * imageInfo.BytesPerPixel + p];
+                                texDataBytes[m * texDataRect.Pitch + n * texelBytesPerPixel + p + bytesOffset] =
+                                    pixels[m * imgRect.Width * imageInfo.BytesPerPixel + n * imageInfo.BytesPerPixel + p];
+                            }
+                            while (texelBytesPerPixel > imageInfo.BytesPerPixel)
+                            {
+                                texDataBytes[m * texDataRect.Pitch + n * texelBytesPerPixel + imageInfo.BytesPerPixel + (texelBytesPerPixel - imageInfo.BytesPerPixel - 1)] = 0xff;
+                                texelBytesPerPixel--;
+                                bytesOffset++;
                             }
                         }
                     }
                     texDataRect.Data.WriteRange(texDataBytes);
-                    _Textures[i * _TextureHorizontalDivide + j].UnlockRectangle(0);
+                    tmpTexture.UnlockRectangle(0);
+                    //_Textures[i * _TextureHorizontalDivide + j].UnlockRectangle(0);
                     texDataRect.Data.Dispose();
+                    _Device.UpdateTexture(tmpTexture, _Textures[i * _TextureHorizontalDivide + j]);
+                    tmpTexture.Dispose();
+                    tmpTexture = null;
                     texDataRect = null;
                     texDataBytes = null;
                 }
             }
 
             return Result.Last;
+        }
+        private IntPtr CreateSurface(int imageWidth, int imageHeight)
+        {
+            int tempWidth = imageWidth;
+            int tempHeight = imageHeight;
+            double scale = 1.0;
+            if (imageWidth > 2048)
+            {
+                scale = 2048.0 / imageWidth;
+            }
+            imageHeight = (int)(scale * imageHeight);
+            if (imageHeight > 2048)
+            {
+                scale = scale * (2048.0 / imageHeight);
+            }
+            tempWidth = (int)(tempWidth * scale);
+            tempHeight = (int)(tempHeight * scale);
+
+            _Surface = Surface.CreateRenderTarget(_Device, tempWidth, tempHeight, Format.A8R8G8B8, MultisampleType.None, 0, true);
+            if (Result.Last.IsFailure)
+            {
+                return IntPtr.Zero;
+            }
+            _Device.SetRenderTarget(0, _Surface);
+            if (Result.Last.IsFailure)
+            {
+                return IntPtr.Zero;
+            }
+            else
+            {
+                return _Surface.ComPointer;
+            }
         }
         private Result InitVertices()
         {

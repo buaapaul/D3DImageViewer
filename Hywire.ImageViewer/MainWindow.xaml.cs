@@ -16,7 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Hywire.D3DWrapper;
 using Microsoft.Win32;
-using SlimDX;
+
 
 namespace Hywire.ImageViewer
 {
@@ -27,7 +27,7 @@ namespace Hywire.ImageViewer
     {
         private ViewModel _ViewModel = null;
 
-        private D3DImageRenderer _ImageWrapper = null;
+        private Hywire.D3DWrapper.D3DImageRenderer _ImageWrapper = null;
         private ImageInfo _ImageInfo = null;
         public MainWindow()
         {
@@ -54,7 +54,8 @@ namespace Hywire.ImageViewer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _ImageWrapper = new D3DImageRenderer();
+            _ImageWrapper = new D3DWrapper.D3DImageRenderer();
+            //test.Initialize(new WindowInteropHelper(this).Handle, System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi("C:\\users\\paul\\desktop\\2500x1000.tif"));
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -102,14 +103,16 @@ namespace Hywire.ImageViewer
                     d3dImg.AddDirtyRect(new Int32Rect(0, 0, d3dImg.PixelWidth, d3dImg.PixelHeight));
                     d3dImg.Unlock();
                 }
+
+                //_ImageInfo.Dispose();
             }
         }
 
         public void StopRendering()
         {
-            d3dImg.Lock();
-            d3dImg.SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
-            d3dImg.Unlock();
+            //d3dImg.Lock();
+            //d3dImg.SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
+            //d3dImg.Unlock();
             _ImageWrapper.CleanUp();
         }
 
@@ -122,11 +125,14 @@ namespace Hywire.ImageViewer
         {
             if (d3dImg.IsFrontBufferAvailable)
             {
-                //StartRendering();
+                if (_ImageInfo.IsLoaded)
+                {
+                    StartRendering();
+                }
             }
             else
             {
-                //StopRendering();
+                StopRendering();
             }
         }
 
@@ -143,13 +149,21 @@ namespace Hywire.ImageViewer
                 _ImageInfo = null;
             }
             StopRendering();
+
+            d3dImg.Lock();
+            d3dImg.SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
+            d3dImg.Unlock();
         }
 
         private void imageContainer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             System.Windows.Point pt = e.GetPosition(imageGrid);
-            _ViewModel.LookAtX = (float)(pt.X / imageGrid.ActualWidth * 2 - 1);
-            _ViewModel.LookAtY = (float)(1 - pt.Y / imageGrid.ActualHeight * 2);
+            float xCoord = (float)(pt.X / imageGrid.ActualWidth * 2 - 1);
+            float yCoord = (float)(1 - pt.Y / imageGrid.ActualHeight * 2);
+            _ViewModel.LookAtX += xCoord / _ViewModel.ViewScale;
+            _ViewModel.LookAtY += yCoord / _ViewModel.ViewScale;
+            //_ViewModel.LookAtX = (float)(pt.X / imageGrid.ActualWidth * 2 - 1);
+            //_ViewModel.LookAtY = (float)(1 - pt.Y / imageGrid.ActualHeight * 2);
             _ViewModel.ViewScale += e.Delta / 1000.0f;
         }
     }

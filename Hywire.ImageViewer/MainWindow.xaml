@@ -23,7 +23,7 @@
             </Menu>
         </Grid>
         <Grid Grid.Row="1" x:Name="imageGrid" Background="#FF83837B">
-            <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Stretch="UniformToFill" MouseWheel="imageContainer_MouseWheel">
+            <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Stretch="Uniform" MouseWheel="imageContainer_MouseWheel">
                 <Image.Source>
                     <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
                 </Image.Source>

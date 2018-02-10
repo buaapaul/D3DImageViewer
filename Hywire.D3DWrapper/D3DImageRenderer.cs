@@ -20,7 +20,7 @@ namespace Hywire.D3DWrapper
     public class D3DImageRenderer
     {
         #region Private Fields
-        private DirectXWrapper _Renderer;
+        private DirectXWrapper _D3dWrapper;
         private IntPtr _BackBuffer;
         private bool _IsInitialized;
         #endregion Private Fields
@@ -41,22 +41,22 @@ namespace Hywire.D3DWrapper
         #endregion Public Properties
         public D3DImageRenderer()
         {
-            _Renderer = new DirectXWrapper();
+            _D3dWrapper = new DirectXWrapper();
         }
         #region Public Functions
         public void Initialize(ImageInfo imageInfo, IntPtr hWnd)
         {
-            _Renderer.Initialize(imageInfo, hWnd);
-            _BackBuffer = _Renderer.SurfacePointer;
+            _D3dWrapper.Initialize(imageInfo, hWnd);
+            _BackBuffer = _D3dWrapper.SurfacePointer;
             _IsInitialized = true;
         }
         public void Draw(ImageDisplayParameters displayParameters)
         {
-            _Renderer.Draw(displayParameters);
+            _D3dWrapper.Draw(displayParameters);
         }
         public void CleanUp()
         {
-            _Renderer.CleanUp();
+            _D3dWrapper.CleanUp();
             _IsInitialized = false;
         }
         #endregion Public Functions

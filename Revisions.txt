@@ -16,3 +16,8 @@ Add mouse wheel event to scale the image;
 Modify the texture creation method, now it could generate texture array to load image of large size;
 Modify the texture creation method, support more formats of image;
 Change the fx file to embedded resource;
+
+20180210-V1.1.0.0
+Modify the texture pool as default, reduce memory consumption;
+Surpport BGR24 format image;
+Add restart rendering in case of lost device;

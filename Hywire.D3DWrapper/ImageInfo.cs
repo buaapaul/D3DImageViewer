@@ -16,6 +16,7 @@ namespace Hywire.D3DWrapper
         private D3DX9.Format _Format;
         private BitmapImage _Image;
         private int _BytesPerPixel;
+        private bool _IsLoaded;
 
         public ImageInfo(BitmapImage image)
         {
@@ -26,6 +27,7 @@ namespace Hywire.D3DWrapper
             _Format = ConvertToTextureFormat(image.Format);
             _Image = image;
             _BytesPerPixel = image.Format.BitsPerPixel / 8;
+            _IsLoaded = true;
         }
 
         public int BackBufferStride { get { return _Stride; } }
@@ -34,6 +36,7 @@ namespace Hywire.D3DWrapper
         public D3DX9.Format PixelFormat { get { return _Format; } }
         public BitmapImage Image { get { return _Image; } }
         public int BytesPerPixel { get { return _BytesPerPixel; } }
+        public bool IsLoaded { get { return _IsLoaded; } }
 
         public static D3DX9.Format ConvertToTextureFormat(PixelFormat imageFormat)
         {
@@ -75,6 +78,7 @@ namespace Hywire.D3DWrapper
             _Image.UriSource = null;
             _Image.BaseUri = null;
             _Image = null;
+            _IsLoaded = false;
         }
     }
 }
