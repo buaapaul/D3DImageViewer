@@ -11,7 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="500*"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Menu >
@@ -22,20 +22,72 @@
                 </MenuItem>
             </Menu>
         </Grid>
-        <Grid Grid.Row="1" x:Name="imageGrid" Background="#FF83837B">
-            <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Stretch="Uniform" MouseWheel="imageContainer_MouseWheel">
-                <Image.Source>
-                    <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
-                </Image.Source>
-            </Image>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="500"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" x:Name="imageGrid" Background="#FF83837B">
+                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Stretch="Uniform" MouseWheel="imageContainer_MouseWheel">
+                    <Image.Source>
+                        <interop:D3DImage x:Name="d3dImg" IsFrontBufferAvailableChanged="d3dImg_IsFrontBufferAvailableChanged"/>
+                    </Image.Source>
+                </Image>
+            </Grid>
+            <Grid Grid.Column="1" IsEnabled="{Binding Path=IsImageLoaded}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <StackPanel>
+                        <Label Content="Display Range" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" FontSize="20"/>
+                        <Grid>
+                            <Label Content="Display High" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,10,0,0"
+                                    Value="{Binding Path=DisplayRangeHigh}" Maximum="{Binding Path=DisplayLimitHigh}" Minimum="1"/>
+                            <TextBox x:Name="dispHighBox" HorizontalAlignment="Right" Height="23" Margin="0,10,10,0" VerticalAlignment="Top" Width="80"
+                                     TextWrapping="Wrap" Text="{Binding DisplayRangeHigh, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                        <Grid>
+                            <Label Content="Display Low" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,10,0,0"
+                                    Value="{Binding Path=DisplayRangeLow}" Maximum="{Binding Path=DisplayLimitHigh}" Minimum="0"/>
+                            <TextBox x:Name="dispLowBox" HorizontalAlignment="Right" Height="23" Margin="0,10,10,0" VerticalAlignment="Top" Width="80"
+                                     TextWrapping="Wrap" Text="{Binding Path=DisplayRangeLow,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Label Content="Color Channel Remap" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" FontSize="20"/>
+                    <Label Content="Red Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,75,280,0"/>
+                    <ComboBox x:Name="redMapBox" HorizontalAlignment="Center" Margin="0,100,280,0" VerticalAlignment="Top" Width="70"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedRedChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                    <Label Content="Green Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,75,100,0"/>
+                    <ComboBox x:Name="greenMapBox" HorizontalAlignment="Center" Margin="0,100,100,0" VerticalAlignment="Top" Width="70"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedGreenChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                    <Label Content="Blue Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="100,75,0,0"/>
+                    <ComboBox x:Name="blueMapBox" HorizontalAlignment="Center" Margin="100,100,0,0" VerticalAlignment="Top" Width="70"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedBlueChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                    <Label Content="Alpha Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="280,75,0,0"/>
+                    <ComboBox x:Name="alphaMapBox" HorizontalAlignment="Center" Margin="280,100,0,0" VerticalAlignment="Top" Width="70"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedAlphaChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                </Grid>
+            </Grid>
         </Grid>
         <Grid Grid.Row="2">
-            <Label Content="Display High" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
-            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,10,0,0"
-                    Value="{Binding Path=DisplayRangeHigh}" Maximum="65535" Minimum="1"/>
-            <Label Content="Display Low" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0"/>
-            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,40,0,0"
-                    Value="{Binding Path=DisplayRangeLow}" Maximum="65534" Minimum="0"/>
         </Grid>
     </Grid>
 </Window>

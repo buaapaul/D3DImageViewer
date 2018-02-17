@@ -11,11 +11,15 @@ using System.IO;
 
 namespace Hywire.D3DWrapper
 {
-    public struct ImageDisplayParameters
+    public struct ImageDisplayParameterStruct
     {
         public float DisplayLimitHigh;
         public float DisplayLimitLow;
         public Vector3 ViewerPosition;
+        public int RedChannelMap;
+        public int GreenChannelMap;
+        public int BlueChannelMap;
+        public int AlphaChannelMap;
     }
     public class D3DImageRenderer
     {
@@ -50,7 +54,7 @@ namespace Hywire.D3DWrapper
             _BackBuffer = _D3dWrapper.SurfacePointer;
             _IsInitialized = true;
         }
-        public void Draw(ImageDisplayParameters displayParameters)
+        public void Draw(ImageDisplayParameterStruct displayParameters)
         {
             _D3dWrapper.Draw(displayParameters);
         }

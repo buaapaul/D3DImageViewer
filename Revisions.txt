@@ -21,3 +21,8 @@ Change the fx file to embedded resource;
 Modify the texture pool as default, reduce memory consumption;
 Surpport BGR24 format image;
 Add restart rendering in case of lost device;
+
+20180217-V1.2.0.0
+Add RGBA color remap function;
+Surpport RGB48 format image;
+

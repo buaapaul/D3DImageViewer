@@ -77,7 +77,7 @@ namespace Hywire.D3DWrapper
 
             return Result.Last;
         }
-        public void Draw(ImageDisplayParameters displayParameters)
+        public void Draw(ImageDisplayParameterStruct displayParameters)
         {
             _Device.Clear(ClearFlags.Target, Color.Transparent.ToArgb(), 1.0f, 0);
             if (_Device.BeginScene().IsSuccess)
@@ -94,6 +94,10 @@ namespace Hywire.D3DWrapper
                         _Effect.SetValue(_Effect.GetParameter(null, "g_DisplayRangeH"), displayParameters.DisplayLimitHigh);
                         _Effect.SetValue(_Effect.GetParameter(null, "g_DisplayRangeL"), displayParameters.DisplayLimitLow);
                         _Effect.SetValue(_Effect.GetParameter(null, "g_mWorldViewProjection"), _WorldViewProj);
+                        _Effect.SetValue(_Effect.GetParameter(null, "g_RedChannelMap"), displayParameters.RedChannelMap);
+                        _Effect.SetValue(_Effect.GetParameter(null, "g_GreenChannelMap"), displayParameters.GreenChannelMap);
+                        _Effect.SetValue(_Effect.GetParameter(null, "g_BlueChannelMap"), displayParameters.BlueChannelMap);
+                        _Effect.SetValue(_Effect.GetParameter(null, "g_AlphaChannelMap"), displayParameters.AlphaChannelMap);
                         _Effect.Technique = _Effect.GetTechnique("DefaultRenderingTechnique");
                         if (Result.Last.IsFailure)
                         {
@@ -215,11 +219,11 @@ namespace Hywire.D3DWrapper
                                 texDataBytes[m * texDataRect.Pitch + n * texelBytesPerPixel + p + bytesOffset] =
                                     pixels[m * imgRect.Width * imageInfo.BytesPerPixel + n * imageInfo.BytesPerPixel + p];
                             }
-                            while (texelBytesPerPixel > imageInfo.BytesPerPixel)
+                            bytesOffset = texelBytesPerPixel;
+                            while (bytesOffset > imageInfo.BytesPerPixel)
                             {
-                                texDataBytes[m * texDataRect.Pitch + n * texelBytesPerPixel + imageInfo.BytesPerPixel + (texelBytesPerPixel - imageInfo.BytesPerPixel - 1)] = 0xff;
-                                texelBytesPerPixel--;
-                                bytesOffset++;
+                                texDataBytes[m * texDataRect.Pitch + n * texelBytesPerPixel + imageInfo.BytesPerPixel + (bytesOffset - imageInfo.BytesPerPixel - 1)] = 0xff;
+                                bytesOffset--;
                             }
                         }
                     }

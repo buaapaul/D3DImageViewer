@@ -65,6 +65,10 @@ namespace Hywire.D3DWrapper
             {
                 texFormat = D3DX9.Format.X8R8G8B8;
             }
+            else if (imageFormat == PixelFormats.Rgb48)
+            {
+                texFormat = D3DX9.Format.A16B16G16R16;
+            }
             else
             {
                 throw new NotSupportedException("Unsurpported image format!");

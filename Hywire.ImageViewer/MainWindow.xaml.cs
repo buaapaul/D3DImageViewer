@@ -28,16 +28,23 @@ namespace Hywire.ImageViewer
         private ViewModel _ViewModel = null;
 
         private Hywire.D3DWrapper.D3DImageRenderer _ImageWrapper = null;
-        private ImageInfo _ImageInfo = null;
         public MainWindow()
         {
             InitializeComponent();
+            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            string ProductVersion;
+            ProductVersion = string.Format("{0}.{1}.{2}.{3}",
+                version.Major,
+                version.Minor,
+                version.Build,
+                version.Revision);
+            this.Title += " V" + ProductVersion;
             _ViewModel = new ViewModel();
             _ViewModel.OnUpdateImage += _ViewModel_OnUpdateImage;
             DataContext = _ViewModel;
         }
 
-        private void _ViewModel_OnUpdateImage(ImageDisplayParameters parameter)
+        private void _ViewModel_OnUpdateImage(ImageDisplayParameterStruct parameter)
         {
             if (!_ImageWrapper.IsInitialized)
             {
@@ -74,7 +81,18 @@ namespace Hywire.ImageViewer
                         img.CreateOptions = BitmapCreateOptions.None | BitmapCreateOptions.PreservePixelFormat;
                         img.StreamSource = fs;
                         img.EndInit();
-                        _ImageInfo = new ImageInfo(img);
+                        if (img.Format == PixelFormats.Gray16 || img.Format == PixelFormats.Rgb48 || img.Format == PixelFormats.Rgba64)
+                        {
+                            _ViewModel.DisplayLimitHigh = 65535;
+                        }
+                        else
+                        {
+                            _ViewModel.DisplayLimitHigh = 255;
+                        }
+                        _ViewModel.DisplayRangeHigh = _ViewModel.DisplayLimitHigh;
+                        _ViewModel.DisplayRangeLow = 0;
+                        _ViewModel.ImageInfo = new ImageInfo(img);
+                        _ViewModel.IsImageLoaded = true;
                     }
                     StartRendering();
                 }
@@ -88,7 +106,7 @@ namespace Hywire.ImageViewer
 
         public void StartRendering()
         {
-            _ImageWrapper.Initialize(_ImageInfo, new WindowInteropHelper(this).Handle);
+            _ImageWrapper.Initialize(_ViewModel.ImageInfo, new WindowInteropHelper(this).Handle);
             IntPtr pSurface = _ImageWrapper.BackBuffer;
             if (pSurface != IntPtr.Zero)
             {
@@ -125,7 +143,7 @@ namespace Hywire.ImageViewer
         {
             if (d3dImg.IsFrontBufferAvailable)
             {
-                if (_ImageInfo.IsLoaded)
+                if (_ViewModel.ImageInfo.IsLoaded)
                 {
                     StartRendering();
                 }
@@ -143,10 +161,11 @@ namespace Hywire.ImageViewer
 
         private void menuClose_Click(object sender, RoutedEventArgs e)
         {
-            if (_ImageInfo != null)
+            if (_ViewModel.ImageInfo != null)
             {
-                _ImageInfo.Dispose();
-                _ImageInfo = null;
+                _ViewModel.ImageInfo.Dispose();
+                _ViewModel.ImageInfo = null;
+                _ViewModel.IsImageLoaded = false;
             }
             StopRendering();
 
