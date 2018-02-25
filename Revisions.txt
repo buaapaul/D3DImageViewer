@@ -26,3 +26,5 @@ Add restart rendering in case of lost device;
 Add RGBA color remap function;
 Surpport RGB48 format image;
 
+20180225-V1.2.1.0
+Modify DX11 Excercise project to create texture by writing pixels;
