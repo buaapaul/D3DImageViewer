@@ -22,6 +22,7 @@ namespace Hywire.ImageViewer
         private float _LookAtY;
         private float _ViewScale;
         private bool _IsImageLoaded;
+        private bool _IsMultiChannelImage;
         private ImageDisplayParameterStruct _DisplayParameters = new ImageDisplayParameterStruct()
         {
             DisplayLimitHigh = 1.0f,
@@ -246,6 +247,18 @@ namespace Hywire.ImageViewer
                 {
                     _IsImageLoaded = value;
                     RaisePropertyChanged("IsImageLoaded");
+                }
+            }
+        }
+        public bool IsMultiChannelImage
+        {
+            get { return _IsMultiChannelImage; }
+            set
+            {
+                if (_IsMultiChannelImage != value)
+                {
+                    _IsMultiChannelImage = value;
+                    RaisePropertyChanged("IsMultiChannelImage");
                 }
             }
         }

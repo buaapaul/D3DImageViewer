@@ -27,7 +27,7 @@ namespace Hywire.ImageViewer
     {
         private ViewModel _ViewModel = null;
 
-        private Hywire.D3DWrapper.D3DImageRenderer _ImageWrapper = null;
+        private D3DImageRenderer _ImageWrapper = null;
         public MainWindow()
         {
             InitializeComponent();
@@ -61,8 +61,7 @@ namespace Hywire.ImageViewer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _ImageWrapper = new D3DWrapper.D3DImageRenderer();
-            //test.Initialize(new WindowInteropHelper(this).Handle, System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi("C:\\users\\paul\\desktop\\2500x1000.tif"));
+            _ImageWrapper = new D3DImageRenderer();
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)

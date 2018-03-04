@@ -58,6 +58,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainWindowDX11.xaml.cs">
+      <DependentUpon>MainWindowDX11.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -71,6 +74,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MainWindowDX11.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -98,6 +105,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Hywire.D3DImageEx\Hywire.D3DImageEx.csproj">
+      <Project>{df152de6-21be-4349-aa91-feacefc5ce7d}</Project>
+      <Name>Hywire.D3DImageEx</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Hywire.D3DWrapper\Hywire.D3DWrapper.csproj">
       <Project>{1d07d8f5-64c8-425f-b45d-6cadab1bdd8d}</Project>
       <Name>Hywire.D3DWrapper</Name>

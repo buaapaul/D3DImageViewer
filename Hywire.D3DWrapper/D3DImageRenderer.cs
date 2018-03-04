@@ -11,6 +11,12 @@ using System.IO;
 
 namespace Hywire.D3DWrapper
 {
+    public enum DirectXVersion
+    {
+        DirectX9 = 0,
+        //DirectX10 = 1,
+        DirectX11 = 2,
+    }
     public struct ImageDisplayParameterStruct
     {
         public float DisplayLimitHigh;
@@ -25,14 +31,35 @@ namespace Hywire.D3DWrapper
     {
         #region Private Fields
         private DirectXWrapper _D3dWrapper;
+        private DirectX11Wrapper _D3d11Wrapper;
         private IntPtr _BackBuffer;
         private bool _IsInitialized;
+        private DirectXVersion _AppliedDXVersion;
         #endregion Private Fields
 
         #region Public Properties
         public IntPtr BackBuffer
         {
-            get { return _BackBuffer; }
+            get
+            {
+                if (_AppliedDXVersion == DirectXVersion.DirectX9)
+                {
+                    return _BackBuffer;
+                }
+                else { return IntPtr.Zero; }
+            }
+        }
+
+        public SlimDX.Direct3D11.Texture2D RenderTarget
+        {
+            get
+            {
+                if (_AppliedDXVersion == DirectXVersion.DirectX11)
+                {
+                    return _D3d11Wrapper.RenderTargetTexture;
+                }
+                else { return null; }
+            }
         }
 
         public bool IsInitialized
@@ -43,24 +70,55 @@ namespace Hywire.D3DWrapper
             }
         }
         #endregion Public Properties
-        public D3DImageRenderer()
+        public D3DImageRenderer(DirectXVersion dxVersion = DirectXVersion.DirectX9)
         {
-            _D3dWrapper = new DirectXWrapper();
+            if(dxVersion== DirectXVersion.DirectX11)
+            {
+                _D3d11Wrapper = new DirectX11Wrapper();
+                _AppliedDXVersion = DirectXVersion.DirectX11;
+            }
+            else
+            {
+                _D3dWrapper = new DirectXWrapper();
+                _AppliedDXVersion = DirectXVersion.DirectX9;
+            }
         }
         #region Public Functions
         public void Initialize(ImageInfo imageInfo, IntPtr hWnd)
         {
-            _D3dWrapper.Initialize(imageInfo, hWnd);
-            _BackBuffer = _D3dWrapper.SurfacePointer;
-            _IsInitialized = true;
+            if (_AppliedDXVersion == DirectXVersion.DirectX9)
+            {
+                _D3dWrapper.Initialize(imageInfo, hWnd);
+                _BackBuffer = _D3dWrapper.SurfacePointer;
+                _IsInitialized = true;
+            }
+            else
+            {
+                _D3d11Wrapper.Initialize(imageInfo, hWnd);
+                _IsInitialized = true;
+            }
         }
         public void Draw(ImageDisplayParameterStruct displayParameters)
         {
-            _D3dWrapper.Draw(displayParameters);
+            if (_AppliedDXVersion == DirectXVersion.DirectX9)
+            {
+                _D3dWrapper.Draw(displayParameters);
+            }
+            else if (_AppliedDXVersion == DirectXVersion.DirectX11)
+            {
+                _D3d11Wrapper.Draw(displayParameters);
+            }
         }
         public void CleanUp()
         {
-            _D3dWrapper.CleanUp();
+            if (_AppliedDXVersion == DirectXVersion.DirectX9)
+            {
+                _D3dWrapper.CleanUp();
+            }
+            else if (_AppliedDXVersion == DirectXVersion.DirectX11)
+            {
+                _D3d11Wrapper.CleanUp();
+            }
             _IsInitialized = false;
         }
         #endregion Public Functions

@@ -1,0 +1,95 @@
+﻿<Window x:Class="Hywire.ImageViewer.MainWindowDX11"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:interop="clr-namespace:Hywire.D3DImageEx;assembly=Hywire.D3DImageEx"
+        xmlns:local="clr-namespace:Hywire.ImageViewer"
+        mc:Ignorable="d"
+        Title="Hywire D3D Image Viewer using DirectX11" Height="800" Width="1280" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closing="Window_Closing" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="500*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Menu >
+                <MenuItem Header="File">
+                    <MenuItem x:Name="menuOpen" Header="Open..." Click="menuOpen_Click"/>
+                    <MenuItem x:Name="menuClose" Header="Close" Click="menuClose_Click"/>
+                    <MenuItem x:Name="menuExit" Header="Exit" Click="menuExit_Click"/>
+                </MenuItem>
+            </Menu>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="500"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" x:Name="imageGrid" Background="#FF83837B">
+                <Image x:Name="imageContainer" Height="auto" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" 
+                       Stretch="Uniform" MouseWheel="imageContainer_MouseWheel">
+                </Image>
+
+            </Grid>
+            <Grid Grid.Column="1" IsEnabled="{Binding Path=IsImageLoaded}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <StackPanel>
+                        <Label Content="Display Range" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" FontSize="20"/>
+                        <Grid>
+                            <Label Content="Display High" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,10,0,0"
+                                    Value="{Binding Path=DisplayRangeHigh}" Maximum="{Binding Path=DisplayLimitHigh}" Minimum="1"/>
+                            <TextBox x:Name="dispHighBox" HorizontalAlignment="Right" Height="23" Margin="0,10,10,0" VerticalAlignment="Top" Width="80"
+                                     TextWrapping="Wrap" Text="{Binding DisplayRangeHigh, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                        <Grid>
+                            <Label Content="Display Low" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                            <Slider Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="100,10,0,0"
+                                    Value="{Binding Path=DisplayRangeLow}" Maximum="{Binding Path=DisplayLimitHigh}" Minimum="0"/>
+                            <TextBox x:Name="dispLowBox" HorizontalAlignment="Right" Height="23" Margin="0,10,10,0" VerticalAlignment="Top" Width="80"
+                                     TextWrapping="Wrap" Text="{Binding Path=DisplayRangeLow,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Label Content="Color Channel Remap" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0" FontSize="20"/>
+                    <Label Content="Red Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,75,280,0"/>
+                    <ComboBox x:Name="redMapBox" HorizontalAlignment="Center" Margin="0,100,280,0" VerticalAlignment="Top" Width="70"
+                              IsEnabled="{Binding Path=IsMultiChannelImage}"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedRedChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                    <Label Content="Green Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,75,100,0"/>
+                    <ComboBox x:Name="greenMapBox" HorizontalAlignment="Center" Margin="0,100,100,0" VerticalAlignment="Top" Width="70"
+                              IsEnabled="{Binding Path=IsMultiChannelImage}"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedGreenChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                    <Label Content="Blue Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="100,75,0,0"/>
+                    <ComboBox x:Name="blueMapBox" HorizontalAlignment="Center" Margin="100,100,0,0" VerticalAlignment="Top" Width="70"
+                              IsEnabled="{Binding Path=IsMultiChannelImage}"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedBlueChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                    <Label Content="Alpha Channel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="280,75,0,0"/>
+                    <ComboBox x:Name="alphaMapBox" HorizontalAlignment="Center" Margin="280,100,0,0" VerticalAlignment="Top" Width="70"
+                              IsEnabled="{Binding Path=IsMultiChannelImage}"
+                          ItemsSource="{Binding Path=ColorChannelOptions}"
+                          SelectedItem="{Binding Path=SelectedAlphaChannelMap}"
+                          DisplayMemberPath="DisplayName">
+                    </ComboBox>
+                </Grid>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Window>
