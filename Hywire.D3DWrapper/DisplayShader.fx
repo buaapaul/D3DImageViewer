@@ -26,7 +26,10 @@ float g_DisplayRangeL;			// normalized display range low value
 //float4x4 g_mWorld;                  // World matrix for object
 float4x4 g_mWorldViewProjection;    // World * View * Projection matrix
 
-
+int g_RedChannelMap;
+int g_GreenChannelMap;
+int g_BlueChannelMap;
+int g_AlphaChannelMap;
 
 //--------------------------------------------------------------------------------------
 // Texture samplers
@@ -83,12 +86,33 @@ struct PS_OUTPUT
 PS_OUTPUT RenderScenePS( VS_OUTPUT In
                          ) 
 { 
-    PS_OUTPUT Output;
+	PS_OUTPUT tmpOut;
+	PS_OUTPUT Output;
 
-    Output.RGBColor = tex2D(MeshTextureSampler, In.TextureUV);
-	Output.RGBColor = (Output.RGBColor - g_DisplayRangeL) / (g_DisplayRangeH - g_DisplayRangeL);
+    tmpOut.RGBColor = tex2D(MeshTextureSampler, In.TextureUV);
+	tmpOut.RGBColor.rgb = (tmpOut.RGBColor.rgb - g_DisplayRangeL) / (g_DisplayRangeH - g_DisplayRangeL);
 
-    return Output;
+	if (g_RedChannelMap == 1) { Output.RGBColor.r = tmpOut.RGBColor.g; }
+	else if (g_RedChannelMap == 2) { Output.RGBColor.r = tmpOut.RGBColor.b; }
+	else if (g_RedChannelMap == 3) { Output.RGBColor.r = tmpOut.RGBColor.a; }
+	else { Output.RGBColor.r = tmpOut.RGBColor.r; }
+
+	if (g_GreenChannelMap == 0) { Output.RGBColor.g = tmpOut.RGBColor.r; }
+	else if (g_GreenChannelMap == 2) { Output.RGBColor.g = tmpOut.RGBColor.b; }
+	else if (g_GreenChannelMap == 3) { Output.RGBColor.g = tmpOut.RGBColor.a; }
+	else { Output.RGBColor.g = tmpOut.RGBColor.g; }
+
+	if (g_BlueChannelMap == 0) { Output.RGBColor.b = tmpOut.RGBColor.r; }
+	else if (g_BlueChannelMap == 1) { Output.RGBColor.b = tmpOut.RGBColor.g; }
+	else if (g_BlueChannelMap == 3) { Output.RGBColor.b = tmpOut.RGBColor.a; }
+	else { Output.RGBColor.b = tmpOut.RGBColor.b; }
+
+	if (g_AlphaChannelMap == 0) { Output.RGBColor.a = tmpOut.RGBColor.r; }
+	else if (g_AlphaChannelMap == 1) { Output.RGBColor.a = tmpOut.RGBColor.g; }
+	else if (g_AlphaChannelMap == 2) { Output.RGBColor.a = tmpOut.RGBColor.b; }
+	else { Output.RGBColor.a = tmpOut.RGBColor.a; }
+
+	return Output;
 }
 
 

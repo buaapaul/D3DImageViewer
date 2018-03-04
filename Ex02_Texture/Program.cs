@@ -6,6 +6,8 @@ using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.Windows;
 using SlimDX.D3DCompiler;
+using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace Ex02_Texture
 {
@@ -63,7 +65,7 @@ namespace Ex02_Texture
                 {
                     Width = width,
                     Height = height,
-                    Format = SlimDX.DXGI.Format.B8G8R8A8_UNorm,
+                    Format = SlimDX.DXGI.Format.R8G8B8A8_UNorm,
                     RefreshRate = new Rational(60, 1),
                 },
                 Usage = SlimDX.DXGI.Usage.RenderTargetOutput,
@@ -285,7 +287,45 @@ namespace Ex02_Texture
                 BindFlags = BindFlags.ShaderResource,
             };
             _TextureRV1 = ShaderResourceView.FromFile(_Device, "haha.dds", imageLoadInfo);
-            _TextureRV2 = ShaderResourceView.FromFile(_Device, "C:\\users\\paul\\desktop\\15000x6000.tif", imageLoadInfo);
+            //_TextureRV2 = ShaderResourceView.FromFile(_Device, "C:\\users\\paul\\desktop\\15000x6000.tif", imageLoadInfo);
+            using (FileStream fs = File.OpenRead("C:\\users\\paul\\desktop\\15000x6000.tif"))
+            {
+                BitmapImage img = new BitmapImage();
+                img.BeginInit();
+                img.CacheOption = BitmapCacheOption.OnLoad;
+                img.CreateOptions = BitmapCreateOptions.None | BitmapCreateOptions.PreservePixelFormat;
+                img.StreamSource = fs;
+                img.EndInit();
+                int stride = img.PixelWidth * img.Format.BitsPerPixel / 8;
+                byte[] imgData = new byte[img.PixelHeight * stride];
+                img.CopyPixels(imgData, stride, 0);
+
+                Texture2DDescription texDesc = new Texture2DDescription
+                {
+                    ArraySize = 1,
+                    BindFlags = BindFlags.ShaderResource,
+                    CpuAccessFlags = CpuAccessFlags.Write,
+                    Format = SlimDX.DXGI.Format.R16_UNorm,
+                    Height = img.PixelHeight,
+                    Width = img.PixelWidth,
+                    MipLevels = 1,
+                    OptionFlags = ResourceOptionFlags.None,
+                    SampleDescription = new SlimDX.DXGI.SampleDescription { Count = 1, Quality = 0 },
+                    Usage = ResourceUsage.Dynamic,
+                };
+                Texture2D tex = new Texture2D(_Device, texDesc);
+                SlimDX.DXGI.Surface surface = tex.AsSurface();
+                DataRectangle dataRec = surface.Map(SlimDX.DXGI.MapFlags.Write | SlimDX.DXGI.MapFlags.Discard);
+                for(int i = 0; i < img.PixelHeight; i++)
+                {
+                    dataRec.Data.Position = dataRec.Pitch * i;
+                    dataRec.Data.WriteRange(imgData, i * stride, stride);
+                }
+                tex.AsSurface().Unmap();
+                _TextureRV2 = new ShaderResourceView(_Device, tex);
+                tex.Dispose();
+                surface.Dispose();
+            }
         }
     }
 }

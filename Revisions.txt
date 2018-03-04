@@ -11,3 +11,23 @@ Add a view model to the WPF project;
 20180205-V1.0.5.0
 Modify the image loading method, use bitmapimage instead of writeablebitmap;
 Add mouse wheel event to scale the image;
+
+20180206-V1.0.6.0
+Modify the texture creation method, now it could generate texture array to load image of large size;
+Modify the texture creation method, support more formats of image;
+Change the fx file to embedded resource;
+
+20180210-V1.1.0.0
+Modify the texture pool as default, reduce memory consumption;
+Surpport BGR24 format image;
+Add restart rendering in case of lost device;
+
+20180217-V1.2.0.0
+Add RGBA color remap function;
+Surpport RGB48 format image;
+
+20180225-V1.2.1.0
+Modify DX11 Excercise project to create texture by writing pixels;
+
+20180304-V1.3.0.0
+Add WPF applying DX11 version for image rendering;
